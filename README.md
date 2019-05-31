@@ -1,2 +1,3 @@
-# Zeboudj
-Zboudj's contrast
+# Zeboudj's contrast
+
+lena picture binarisation (open with xv)
