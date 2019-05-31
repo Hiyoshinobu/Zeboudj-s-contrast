@@ -146,7 +146,10 @@ int parseCarre(unsigned char **carre, int X, int Y)
 void binCarre(unsigned char **carre, int X, int Y, int seuil)
 //Binarise un carre de X par Y avec seuil comme limite
 {
-
+	int j;
+	for(i=0;i<X;i++)
+		for(j=0;j<Y;j++)
+			carre[i][j]=256*(seuil>carre[i][j]);
 }
 
 int main()
