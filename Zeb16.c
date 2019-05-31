@@ -54,6 +54,7 @@ int voisin(unsigned char** tab, int x, int y, int X, int Y)
 }
 
 int interieur(unsigned char** tab, int x, int y, int X, int Y, int seuil)
+//Retourn 1 si le pixel est intérieur, par rapport à ses voisins
 {
 	int tmp[9]={0}, i, schlag=0;
 	if(y>0)
@@ -76,7 +77,7 @@ int interieur(unsigned char** tab, int x, int y, int X, int Y, int seuil)
 		if(tmp[i]<seuil)
 			schlag+=1;
 	}
-	return (schlag%9 == 0);
+	return (schlag%9 == 0);//schlag%9==0 <==> pixel est interieur
 }
 
 
@@ -101,30 +102,31 @@ void sauveTab(FILE *p, int X, int Y, unsigned char **tab)
     fseek(p, X/4, SEEK_CUR);
     debug+=X/4;
   }
-  printf("%d\n", debug);
+  printf("%d\n%d\n", debug, 256 + X*Y/4);
   fseek(p, 0, SEEK_SET);
 }
 
 void pixToTab16(unsigned char*** tab, int X, int Y, FILE *input)
 {
-	int i,j,k;
+	int i=0, DEBUG=256,X4 = X/4,Y4 = Y/4;
 	fseek(input, 256, SEEK_SET);
-	printf("DEBUG\n");
+	/*
 	for(i=0;i<16;i++)
 		for(j=0;j<X/4;j++)
 			for(k=0;k<Y/4;k++)
 				tab[i][j][k] = (unsigned char) fgetc(input);//tab[numtab][][]
+
+	*/
 	printf("DEBUG\n");
-	for(i=0;i<16;i++)
-		for(j=0;j<X/4;j++)
-			for(k=0;k<Y/4;k++)
-				printf("%c", tab[i][j][k]);
+	//for(i=0;i<16;i++){
+	for(i;i<X*Y;i++)
+		tab[(i/Y4)+4*(i/Y4)][i/Y4][i%Y4]=(unsigned char) fgetc(input);
 }
 
 int parseCarre(unsigned char **carre, int X, int Y)
 {
-	int i,j,seuil, seuilmax, E=0, I=0, surface=0;
-	unsigned char **tab_int;
+	int i,j,seuil, seuilmax=0, E=0, I=0, surface=0;
+	unsigned char **tab_interieur;
 	tab_interieur = (unsigned char**) malloc(sizeof(unsigned char*)*(X));
 	for(i=0;i<X/2;i++)
 		tab_interieur[i] = (unsigned char*) malloc(sizeof(unsigned char)*(Y));
@@ -134,10 +136,13 @@ int parseCarre(unsigned char **carre, int X, int Y)
 		E=0;I=0;surface=0;
 		for(i=0;i<X;i++){
 			for(j=0;j<Y;j++){
-				tab_interieur[i][j]=(unsigned char) interieur(tab, i, j, X, Y, seuil);
+				tab_interieur[i][j]=(unsigned char) interieur(carre, i, j, X, Y, seuil);
 				surface += tab_interieur[i][j];
+				if(tab_interieur)I++;else E++;
 			}
 		}
+		if (CRI(E, I) > seuilmax)
+			seuilmax=CRI(E,I);
 	}
 
 	return seuilmax;
@@ -146,7 +151,7 @@ int parseCarre(unsigned char **carre, int X, int Y)
 void binCarre(unsigned char **carre, int X, int Y, int seuil)
 //Binarise un carre de X par Y avec seuil comme limite
 {
-	int j;
+	int i,j;
 	for(i=0;i<X;i++)
 		for(j=0;j<Y;j++)
 			carre[i][j]=256*(seuil>carre[i][j]);
@@ -155,7 +160,7 @@ void binCarre(unsigned char **carre, int X, int Y, int seuil)
 int main()
 {
 	FILE *input, *output;
-	int dimX, dimY, i, j;
+	int dimX, dimY, i, j, seuilmax;
 	unsigned char ***tab;
 	input=fopen("muscle.lena","r");
 	output=fopen("output.lena","w");
@@ -172,5 +177,11 @@ int main()
 			tab[i][j] = (unsigned char*) malloc(sizeof(unsigned char)*(dimY/4));
 		}
 	}
+	printf("%d %d\n", dimX, dimY);
+	//--------------------Main program-----------------//
 	pixToTab16(tab, dimX, dimY, input);
+	for(i=0;i<16;i++)
+	{
+		seuilmax = parseCarre(tab[i], dimX, dimY);
+	}
 }
