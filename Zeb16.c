@@ -120,7 +120,12 @@ void pixToTab16(unsigned char*** tab, int X, int Y, FILE *input)
 	printf("DEBUG\n");
 	//for(i=0;i<16;i++){
 	for(i;i<X*Y;i++)
-		tab[(i/Y4)+4*(i/Y4)][i/Y4][i%Y4]=(unsigned char) fgetc(input);
+	{
+		if(i%Y4==0 || i%Y4 == 63)
+		printf("%d %d %d\n", i/(Y4*X4), i/Y4, i%Y4);
+		tab[i/(Y4*X4)][i/Y4][i%Y4]=(unsigned char) fgetc(input);
+	}
+
 }
 
 int parseCarre(unsigned char **carre, int X, int Y)
