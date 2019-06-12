@@ -108,24 +108,13 @@ void sauveTab(FILE *p, int X, int Y, unsigned char **tab)
 
 void pixToTab16(unsigned char*** tab, int X, int Y, FILE *input)
 {
-	int i=0, DEBUG=256,X4 = X/4,Y4 = Y/4;
+	int i=0, j=0, k=0, DEBUG=256,X4 = X/4,Y4 = Y/4;
 	fseek(input, 256, SEEK_SET);
-	/*
-	for(i=0;i<16;i++)
-		for(j=0;j<X/4;j++)
-			for(k=0;k<Y/4;k++)
-				tab[i][j][k] = (unsigned char) fgetc(input);//tab[numtab][][]
-
-	*/
-	printf("DEBUG\n");
-	//for(i=0;i<16;i++){
 	for(i;i<X*Y;i++)
 	{
-		if(i%Y4==0 || i%Y4 == 63)
-		printf("%d %d %d\n", i/(Y4*X4), i/Y4, i%Y4);
-		tab[i/(Y4*X4)][i/Y4][i%Y4]=(unsigned char) fgetc(input);
+		tab[i/(Y4*X4)][(i/Y4)%X4][i%X4]=(unsigned char) fgetc(input);
 	}
-
+	printf("DEBUG");
 }
 
 int parseCarre(unsigned char **carre, int X, int Y)
@@ -185,8 +174,10 @@ int main()
 	printf("%d %d\n", dimX, dimY);
 	//--------------------Main program-----------------//
 	pixToTab16(tab, dimX, dimY, input);
+	printf("DEBUG");
 	for(i=0;i<16;i++)
 	{
 		seuilmax = parseCarre(tab[i], dimX, dimY);
 	}
+	printf("DEBUG");
 }
