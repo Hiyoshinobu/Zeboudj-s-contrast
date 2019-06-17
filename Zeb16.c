@@ -39,17 +39,26 @@ int voisin(unsigned char** tab, int x, int y, int X, int Y)
 	int tmp[8]={0}, i=0, schlag=0;
 	if(y>0)
 	{
-		if(x>0)tmp[0]=tab[x][y]-tab[x-1][y-1];
+		if(x>0)
+			tmp[0]=tab[x][y]-tab[x-1][y-1];
 		tmp[1]=tab[x][y]-tab[x][y-1];
-		if(x<X-1)tmp[2]=tab[x][y]-tab[x+1][y-1];}
-	if(x>0)tmp[3]=tab[x][y]-tab[x-1][y];
-	if(x<X-1)tmp[4]=tab[x][y]-tab[x+1][y];
-	if(y<Y-1)
-	{
-		if(x>0)tmp[5]=tab[x][y]-tab[x-1][y+1];
-		tmp[6]=tab[x][y]-tab[x][y+1];
-		if(x<X-1)tmp[7]=tab[x][y]-tab[x+1][y+1];}
-	for(i=0;i<8;i++)if(abs(tmp[i])>schlag)schlag=tmp[i];
+		if(x<X-1)
+			tmp[2]=tab[x][y]-tab[x+1][y-1];
+	}
+		if(x>0)
+			tmp[3]=tab[x][y]-tab[x-1][y];
+		if(x<X-1)
+			tmp[4]=tab[x][y]-tab[x+1][y];
+		if(y<Y-1){
+			if(x>0)
+				tmp[5]=tab[x][y]-tab[x-1][y+1];
+			tmp[6]=tab[x][y]-tab[x][y+1];
+			if(x<X-1)
+				tmp[7]=tab[x][y]-tab[x+1][y+1];
+		}
+		for(i=0;i<8;i++)
+			if(abs(tmp[i])>schlag)
+				schlag=tmp[i];
 	return schlag;
 }
 
@@ -57,19 +66,25 @@ int interieur(unsigned char** tab, int x, int y, int X, int Y, int seuil)
 //Retourn 1 si le pixel est intérieur, par rapport à ses voisins
 {
 	int tmp[9]={0}, i, schlag=0;
-	if(y>0)
-	{
-		if(x>0)tmp[0]=tab[x-1][y-1];
+	if(y>0){
+		if(x>0)
+			tmp[0]=tab[x-1][y-1];
 		tmp[1]=tab[x][y-1];
-		if(x<X-1)tmp[2]=tab[x+1][y-1];}
-	if(x>0)tmp[3]=tab[x-1][y];
+		if(x<X-1)
+			tmp[2]=tab[x+1][y-1];
+	}
+	if(x>0)
+		tmp[3]=tab[x-1][y];
 	tmp[4]=tab[x][y];
-	if(x<X-1)tmp[5]=tab[x+1][y];
+	if(x<X-1)
+		tmp[5]=tab[x+1][y];
 	if(y<Y-1)
 	{
-		if(x>0)tmp[6]=tab[x-1][y+1];
+		if(x>0)
+			tmp[6]=tab[x-1][y+1];
 		tmp[7]=tab[x][y+1];
-		if(x<X-1)tmp[8]=tab[x+1][y+1];}
+		if(x<X-1)
+			tmp[8]=tab[x+1][y+1];}
 	for(i=0;i<9;i++)
 	{
 		if(tmp[i]>seuil)
@@ -108,13 +123,19 @@ void sauveTab(FILE *p, int X, int Y, unsigned char **tab)
 
 void pixToTab16(unsigned char*** tab, int X, int Y, FILE *input)
 {
-	int i=0, j=0, k=0, DEBUG=256,X4 = X/4,Y4 = Y/4;
+	int i=0, DEBUG=256,X4 = X/4,Y4 = Y/4;
 	fseek(input, 256, SEEK_SET);
+	/*
+	for(i=0;i<16;i++)
+		for(j=0;j<X/4;j++)
+			for(k=0;k<Y/4;k++)
+				tab[i][j][k] = (unsigned char) fgetc(input);//tab[numtab][][]
+
+	*/
+	printf("DEBUG\n");
+	//for(i=0;i<16;i++){
 	for(i;i<X*Y;i++)
-	{
-		tab[i/(Y4*X4)][(i/Y4)%X4][i%X4]=(unsigned char) fgetc(input);
-	}
-	printf("DEBUG");
+		tab[(i/Y4)+4*(i/Y4)][i/Y4][i%Y4]=(unsigned char) fgetc(input);
 }
 
 int parseCarre(unsigned char **carre, int X, int Y)
@@ -174,10 +195,8 @@ int main()
 	printf("%d %d\n", dimX, dimY);
 	//--------------------Main program-----------------//
 	pixToTab16(tab, dimX, dimY, input);
-	printf("DEBUG");
 	for(i=0;i<16;i++)
 	{
 		seuilmax = parseCarre(tab[i], dimX, dimY);
 	}
-	printf("DEBUG");
 }
